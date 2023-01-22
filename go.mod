@@ -1,3 +1,3 @@
-module go-homebrew-interpreter
+module monkey
 
 go 1.19
