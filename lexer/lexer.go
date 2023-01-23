@@ -24,16 +24,7 @@ func New(input string) *Lexer {
 }
 
 
-// 一个个的去读取input中的字符，把字符写入ch字段中
-func (l *Lexer) readChar() {
-	if l.readPosition >= len(l.input) {
-		l.ch = 0
-	} else {
-		l.ch = l.input[l.readPosition]
-	}
-	l.position = l.readPosition
-	l.readPosition += 1
-}
+
 
 
 // 词法分析的主要函数
@@ -42,9 +33,39 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 	switch l.ch {
 	case '=':
-		t = token.NewToken(token.ASSIGN, l.ch)
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			t = &token.Token{
+				Literal: string(ch) + string(l.ch),
+				Type: token.EQ,
+			}
+		} else {
+			t = token.NewToken(token.ASSIGN, l.ch)
+		}
 	case '+':
 		t = token.NewToken(token.PLUS, l.ch)
+	case '-':
+		t = token.NewToken(token.MINUS, l.ch)
+	case '*':
+		t = token.NewToken(token.ASTERISK, l.ch)
+	case '/':
+		t = token.NewToken(token.SLASH, l.ch)
+	case '!':
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			t = &token.Token{
+				Literal: string(ch) + string(l.ch),
+				Type: token.NOT_EQ,
+			}
+		} else {
+			t = token.NewToken(token.BANG, l.ch)
+		}
+	case '<':
+		t = token.NewToken(token.LT, l.ch)
+	case '>':
+		t = token.NewToken(token.GT, l.ch)
 	case '(':
 		t = token.NewToken(token.LPAREN, l.ch)
 	case ')':
@@ -85,6 +106,28 @@ func (l *Lexer) NextToken() token.Token {
 	l.readChar()
 	return *t
 }
+
+
+// 一个个的去读取input中的字符，把字符写入ch字段中
+func (l *Lexer) readChar() {
+	if l.readPosition >= len(l.input) {
+		l.ch = 0
+	} else {
+		l.ch = l.input[l.readPosition]
+	}
+	l.position = l.readPosition
+	l.readPosition += 1
+}
+
+
+// 窥探下一个字符，来判断是否是 == ！= 这种；
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	} 
+	return l.input[l.readPosition]
+}
+
 
 
 // 读取标识符/关键字，后续还需要对其进行判断，但这里只需要读一下

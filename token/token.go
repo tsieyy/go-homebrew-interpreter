@@ -17,8 +17,18 @@ const (
 	INT = "INT" // 123  321
 
 	// 运算符
-	PLUS = "+"
-	ASSIGN = "="
+	ASSIGN = "=" 
+	PLUS = "+" 
+	MINUS = "-" 
+	BANG = "!" 
+	ASTERISK = "*" 
+	SLASH = "/"
+
+	LT = "<" 
+	GT = ">"
+
+	EQ = "=="
+	NOT_EQ = "!="
 
 	// 分隔符
 	COMMA = ","
@@ -32,6 +42,11 @@ const (
 	// 关键字
 	FUNCTION = "FUNCTION"
 	LET = "LET"
+	TRUE = "TRUE"
+	FALSE = "FALSE"
+	IF = "IF"
+	ELSE = "ELSE"
+	RETURN = "RETURN"
 
 )
 
@@ -58,6 +73,11 @@ func NewToken(t TokenType, b byte) *Token {
 var keywords = map[string]TokenType {
 	"fn": FUNCTION,
 	"let": LET,
+	"true": TRUE,
+	"false": FALSE,
+	"if": IF,
+	"else": ELSE,
+	"return": RETURN,
 }
 
 // 查找是否在keyword中，以判断是否是关键字还是标识符
