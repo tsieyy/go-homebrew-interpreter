@@ -52,3 +52,21 @@ func NewToken(t TokenType, b byte) *Token {
 		Literal: string(b),
 	}
 }
+
+
+// 关键字的映射，用于判断字符是关键字还是标识符
+var keywords = map[string]TokenType {
+	"fn": FUNCTION,
+	"let": LET,
+}
+
+// 查找是否在keyword中，以判断是否是关键字还是标识符
+func LookupIdent(ident string) TokenType {
+	// t , ok := keywords[ident]
+	if t, ok := keywords[ident]; ok {
+		return t
+	} else {
+		return IDENT
+	}
+}
+

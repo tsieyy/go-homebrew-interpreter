@@ -39,6 +39,7 @@ func (l *Lexer) readChar() {
 // 词法分析的主要函数
 func (l *Lexer) NextToken() token.Token {
 	var t *token.Token
+	l.skipWhitespace()
 	switch l.ch {
 	case '=':
 		t = token.NewToken(token.ASSIGN, l.ch)
@@ -63,7 +64,64 @@ func (l *Lexer) NextToken() token.Token {
 			Literal: "",
 			Type: token.EOF,
 		}
+	default:
+		if isLetter(l.ch) {
+			t = &token.Token{
+				Literal: l.readIdentifier(),
+				//Type: token.LookupIdent(t.Literal),
+			}
+			t.Type = token.LookupIdent(t.Literal)
+			return *t
+		} else if isNumber(l.ch) {
+			t = &token.Token{
+				Type: token.INT,
+				Literal: l.readNumber(),
+			}
+			return *t
+		} else {
+			t = token.NewToken(token.ILLEGAL, l.ch)
+		}
 	}
 	l.readChar()
 	return *t
+}
+
+
+// 读取标识符/关键字，后续还需要对其进行判断，但这里只需要读一下
+func (l *Lexer) readIdentifier() string {
+	position := l.position
+	for isLetter(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+
+// 读取数字，同上方函数相似，把数字转换为token
+func (l *Lexer) readNumber() string {
+	position := l.position
+	for isNumber(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+
+
+// 当读取到的是空格时，跳过
+func (l *Lexer) skipWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' { 
+		l.readChar() 
+	}
+}
+
+
+// 一个工具方法，判断byte是否为字母
+func isLetter(ch byte) bool {
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
+// 工具方法，判断byte是否为数字
+func isNumber(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }
