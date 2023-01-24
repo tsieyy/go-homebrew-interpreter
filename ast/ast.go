@@ -52,6 +52,20 @@ func (l *LetStatement) TokenLiteral() string {
 
 
 
+
+type ReturnStatement struct {
+	Token token.Token //token.RETURN
+	ReturnValue Expression
+}
+// 实现接口
+func (r *ReturnStatement) statementNode() {}
+func (r *ReturnStatement) TokenLiteral() string {
+	return r.Token.Literal
+} 
+
+
+
+
 type Identifier struct {
 	Token token.Token //token.IDENT
 	Value string
