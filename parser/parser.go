@@ -109,8 +109,9 @@ func (p *Parser) nextToken() {
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
-	for p.currentToken.Type != token.EOF {
-		if stmt := p.parseStatement(); stmt != nil {
+	for !p.currentTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
 		p.nextToken()
@@ -132,40 +133,42 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 // 解析letStatement
-func (p *Parser) parseLetStatement() ast.Statement {
-	stmt := ast.LetStatement{
-		Token: p.currentToken,
-	}
+func (p *Parser) parseLetStatement() *ast.LetStatement {
+	stmt := &ast.LetStatement{Token: p.currentToken}
+
 	if !p.expectPeek(token.IDENT) {
-		//p.peekError(p.currentToken.Type)
 		return nil
 	}
-	stmt.Name = &ast.Identifier{
-		Token: p.currentToken,
-		Value: p.currentToken.Literal,
-	}
+
+	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentToken.Literal}
+
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
-	// TODO：表达式的处理
-	for !p.currentTokenIs(token.SEMICOLON) {
-		// TODO: 需要在这里添加对表达式的处理
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
-	return &stmt
+
+	return stmt
 }
 
 // 解析 returnStatement
-func (p *Parser) parseReturnStatement() ast.Statement {
-	stmt := &ast.ReturnStatement{
-		Token: p.currentToken,
-	}
+func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
+	stmt := &ast.ReturnStatement{Token: p.currentToken}
+
 	p.nextToken()
 
-	// TODO:先跳过表达式的处理
-	for !p.currentTokenIs(token.SEMICOLON) {
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
 	return stmt
 }
 
@@ -432,3 +435,6 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 	}
 	return args
 }
+
+
+
