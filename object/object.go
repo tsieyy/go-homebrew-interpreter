@@ -22,6 +22,7 @@ const (
 	ERROR_OBJ = "ERROR_OBJ"  // TODO：这里是不是有问题
 	FUNCTION_OBJ = "FUNCTION"
 	STRING_OBJ = "STRING"
+	BUILTIN_OBJ = "BUILTIN"
 )
 
 
@@ -122,4 +123,18 @@ func (s *String) Inspect() string {
 }
 func (s *String) Type() ObjectType {
 	return STRING_OBJ
+}
+
+
+
+type BuiltinFunction func (args ...Object) Object
+
+type Builtin struct {
+	Fn BuiltinFunction
+}
+func (b *Builtin) Inspect() string {
+	return "built-in function"
+}
+func (b *Builtin) Type() ObjectType {
+	return BUILTIN_OBJ
 }
