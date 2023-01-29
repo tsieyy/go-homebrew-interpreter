@@ -1,6 +1,8 @@
 package lexer
 
-import "monkey/token"
+import (
+	"monkey/token"
+)
 
 // 只能读取ASCLL码，
 // TODO：utf-8,emoji
@@ -78,6 +80,10 @@ func (l *Lexer) NextToken() token.Token {
 		t = token.NewToken(token.COMMA, l.ch)
 	case ';':
 		t = token.NewToken(token.SEMICOLON, l.ch)
+	case '"':
+		t = &token.Token{}
+		t.Type = token.STRING
+		t.Literal = l.readString()
 	case 0:
 		//t.Literal = " "
 		//t.Type = token.EOF
@@ -145,6 +151,18 @@ func (l *Lexer) readNumber() string {
 	position := l.position
 	for isNumber(l.ch) {
 		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+// 读string
+func (l *Lexer) readString() string {
+	position := l.position + 1
+	for {
+		l.readChar()
+		if l.ch == '"' || l.ch == 0 {
+			break
+		} 
 	}
 	return l.input[position:l.position]
 }

@@ -19,8 +19,9 @@ const (
 	BOOLEAN_OBJ = "BOOLEAN"
 	NULL_OBJ = "NULL"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
-	ERROR_OBJ = "ERROR_OBJ"
+	ERROR_OBJ = "ERROR_OBJ"  // TODO：这里是不是有问题
 	FUNCTION_OBJ = "FUNCTION"
+	STRING_OBJ = "STRING"
 )
 
 
@@ -110,4 +111,15 @@ func (f *Function) Inspect() string {
 }
 func (f *Function) Type() ObjectType {
 	return FUNCTION_OBJ
+}
+
+
+type String struct {
+	Value string
+}
+func (s *String) Inspect() string {
+	return s.Value
+}
+func (s *String) Type() ObjectType {
+	return STRING_OBJ
 }

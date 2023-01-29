@@ -170,25 +170,25 @@ if (10 > 1) {
 `,
 			10,
 		},
-// 		{
-// 			`
-// let f = fn(x) {
-//   return x;
-//   x + 10;
-// };
-// f(10);`,
-// 			10,
-// 		},
-// 		{
-// 			`
-// let f = fn(x) {
-//    let result = x + 10;
-//    return result;
-//    return 10;
-// };
-// f(10);`,
-// 			20,
-// 		},
+		{
+			`
+let f = fn(x) {
+  return x;
+  x + 10;
+};
+f(10);`,
+			10,
+		},
+		{
+			`
+let f = fn(x) {
+   let result = x + 10;
+   return result;
+   return 10;
+};
+f(10);`,
+			20,
+		},
 	}
 
 	for _, tt := range tests {
@@ -204,6 +204,10 @@ func TestErrorHandling(t *testing.T) {
 		input           string
 		expectedMessage string
 	}{
+		{ 
+			`"Hello" - "World"`, 
+			"unknown operator: STRING - STRING", 
+		},
 		{
 			"5 + true;",
 			"type mismatch: INTEGER + BOOLEAN",
@@ -220,10 +224,10 @@ func TestErrorHandling(t *testing.T) {
 			"true + false;",
 			"unknown operator: BOOLEAN + BOOLEAN",
 		},
-		// {
-		// 	"true + false + true + false;",
-		// 	"unknown operator: BOOLEAN + BOOLEAN",
-		// },
+		{
+			"true + false + true + false;",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
 		{
 			"5; true + false; 5",
 			"unknown operator: BOOLEAN + BOOLEAN",
@@ -232,18 +236,18 @@ func TestErrorHandling(t *testing.T) {
 			"if (10 > 1) { true + false; }",
 			"unknown operator: BOOLEAN + BOOLEAN",
 		},
-		// {
-		// 	`
-		// 	if (10 > 1) {
-		// 		if (10 > 1) {
-		// 			return true + false;
-		// 		}
+		{
+			`
+			if (10 > 1) {
+				if (10 > 1) {
+					return true + false;
+				}
 
-		// 		return 1;
-		// 	}
-		// 	`,
-		// 	"unknown operator: BOOLEAN + BOOLEAN",
-		// },
+				return 1;
+			}
+			`,
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
 		{
 			"foobar",
 			"identifier not found: foobar",
@@ -299,5 +303,31 @@ func TestFunctionApplication(t *testing.T) {
 	} 
 	for _, tt := range tests { 
 		testIntegerObject(t, testEval(tt.input), tt.expected) 
+	} 
+}
+
+func TestStringLiteral(t *testing.T) { 
+	input := `"Hello World!"` 
+	evaluated := testEval(input) 
+	str, ok := evaluated.(*object.String) 
+	if !ok { 
+		t.Fatalf("object is not String. got=%T (%+v)", evaluated, evaluated) 
+	} 
+	if str.Value != "Hello World!" { 
+		t.Errorf("String has wrong value. got=%q", str.Value) 
+	} 
+}
+
+
+func TestStringConcatenation(t *testing.T) { 
+	// 字符串拼接
+	input := `"Hello" + " " + "World!"` 
+	evaluated := testEval(input) 
+	str, ok := evaluated.(*object.String) 
+	if !ok { 
+		t.Fatalf("object is not String. got=%T (%+v)", evaluated, evaluated) 
+	} 
+	if str.Value != "Hello World!" { 
+		t.Errorf("String has wrong value. got=%q", str.Value) 
 	} 
 }
